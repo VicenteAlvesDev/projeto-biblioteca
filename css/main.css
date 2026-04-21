@@ -119,8 +119,8 @@ nav .menu-items {
 
 .menu-items .mode {
     display: flex;
-align-items: center;
-white-space: nowrap;
+    align-items: center;
+    white-space: nowrap;
 }
 nav.close li a .link-name {
     display: none;
@@ -388,4 +388,61 @@ nav.close li a .link-name {
     overflow: auto;
     background-color: white;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.overview .title {
+    display: flex;
+    align-items: center;
+    margin: 6px 0 30px 0;
+}
+
+.title i {
+    height: 35px;
+    width: 35px;
+    background-color: #3E5055;
+    border-radius: 6px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.title .text {
+    font-size: 24px;
+    font-weight: 500;
+    color: #000;
+    margin-left: 10px;
+}
+
+/* FIM DO SCROLL */
+.table-div {
+    font-size: 20px;
+    margin: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid rgb(222, 222, 222);
+    table-layout: auto;
+}
+
+table td,
+table th {
+    padding: 12px 15px;
+    text-align: center;
+    font-size: 12px;
+}
+
+table th {
+    background-color: #3E5055;
+    color: #ffffff;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f5f5f5;
+    border: 1px solid rgb(222, 222, 222);
 }
