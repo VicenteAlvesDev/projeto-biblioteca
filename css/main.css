@@ -17,10 +17,12 @@
 }
 
 /* A regra afetará o corpo da página*/
+/* MENU */
 body {
     min-height: 100vh;
     background-color: #0E4BF1;
 }
+
 /* O nav criará efeito para o menu lateral*/
 nav {
     top: 0;
