@@ -3,99 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- compatibilidade -->
-     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <!-- bootstrap icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-    <!-- ícone de imagem na guia do navegador -->
-    <link rel="icon" href="img/livro.ico">
-    
-    <!-- Link de acesso a folha css (main.css) -->
-    <link rel="stylesheet" href="./css/main.css">
-    
-    <!-- Link de acesso a folha css (crud.css) -->
-    <link rel="stylesheet" href="./css/crud.css">
-
-    <!-- Link de acesso a folha css (modal.css) -->
-    <link rel="stylesheet" href="./css/modal.css">
-
-    <!-- Link de acesso a folha css (records.css) -->
-    <link rel="stylesheet" href="./css/records.css">
-    
-    <!-- Link de acesso a folha css (button.css)-->
-    <link rel="stylesheet" href="./css/button.css">
     <title>Biblioteca Escola</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/crud.css" />
+    <link rel="stylesheet" href="./css/modal.css" />
+    <link rel="stylesheet" href="./css/records.css" />
+    <link rel="stylesheet" href="./css/button.css" />
+    <script src="./js/editoras.js" defer></script>
+    <script src="./js/main.js" defer></script>
 </head>
-
 <body>
 
 <div class="corpo">
 
     <!-- ================= NAVBAR ================= -->
     <nav>
-
-        <!-- Botão menu lateral -->
         <div class="menu-sid">
             <i class="bi bi-list sidebar-toggle"></i>
         </div>
-
-        <!-- Logo -->
         <div class="div-logo-name">
             <span class="logo-name">Biblioteca</span>
         </div>
-
-        <!-- Menu -->
         <div class="menu-items">
             <ul class="nav-links">
-
-                <li>
-                    <a href="Dashboard.html">
-                        <i class="bi bi-house"></i>
-                        <span class="link-name">Dashboard</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="Alunos.html">
-                        <i class="bi bi-person-vcard"></i>
-                        <span class="link-name">Alunos</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="Funcionarios.html">
-                        <i class="bi bi-person-vcard"></i>
-                        <span class="link-name">Funcionários</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="Editoras.html">
-                        <i class="bi bi-clipboard-data"></i>
-                        <span class="link-name">Editoras</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="Livros.html">
-                        <i class="bi bi-book"></i>
-                        <span class="link-name">Livros</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="Emprestimos.html">
-                        <i class="bi bi-person-workspace"></i>
-                        <span class="link-name">Empréstimos</span>
-                    </a>
-                </li>
-
-            </ul> <!-- nav-links -->
-        </div> <!-- menu-items -->
-
+                <li><a href="Dashboard.html"><i class="bi bi-house"></i><span class="link-name">Dashboard</span></a></li>
+                <li><a href="Alunos.html"><i class="bi bi-person-vcard"></i><span class="link-name">Alunos</span></a></li>
+                <li><a href="Funcionarios.html"><i class="bi bi-person-vcard"></i><span class="link-name">Funcionários</span></a></li>
+                <li><a href="Editoras.html"><i class="bi bi-clipboard-data"></i><span class="link-name">Editoras</span></a></li>
+                <li><a href="Livros.html"><i class="bi bi-book"></i><span class="link-name">Livros</span></a></li>
+                <li><a href="Emprestimos.html"><i class="bi bi-person-workspace"></i><span class="link-name">Empréstimos</span></a></li>
+            </ul>
+        </div>
     </nav>
 
     <!-- ================= DASHBOARD ================= -->
@@ -103,73 +42,42 @@
 
         <!-- Topo -->
         <div class="top">
-
             <i class="bi bi-list sidebar-toggle2"></i>
-
-            <!-- Logo topo -->
             <div class="logo-name">
-                <h1 class="wda-logo">Biblioteca</h1>
+                <h1 class="seduc-logo">Biblioteca</h1>
             </div>
-
-            <!-- ===== Menu Dropdown (perfil) ===== -->
             <div class="actionimg">
-
-                <!-- Foto perfil -->
                 <div class="profile" onclick="menuToggle();">
                     <img src="img/avatar5.png" alt="">
                 </div>
-
-                <!-- Menu dropdown -->
                 <div class="menu">
                     <h3>Antônio Carlos</h3>
-
                     <ul>
-                        <li>
-                            <i class="bi bi-person"></i>
-                            <a href="#">Perfil</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-question-circle"></i>
-                            <a href="#">Ajudar</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-gear"></i>
-                            <a href="#">Configurações</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-box-arrow-right"></i>
-                            <a href="index.html">Saída</a>
-                        </li>
+                        <li><i class="bi bi-person"></i><a href="#">Perfil</a></li>
+                        <li><i class="bi bi-question-circle"></i><a href="#">Ajudar</a></li>
+                        <li><i class="bi bi-gear"></i><a href="#">Configurações</a></li>
+                        <li><i class="bi bi-box-arrow-right"></i><a href="index.html">Saída</a></li>
                     </ul>
-
-                </div><!-- menu -->
-
-            </div><!-- actionimg -->
-
-        </div><!-- top -->
+                </div>
+            </div>
+        </div>
 
         <!-- ================= CONTEÚDO ================= -->
         <div class="corpo-da-pag">
             <div class="scroll">
                 <div class="activity">
 
-                    <!-- Cabeçalho -->
                     <div class="overview">
-
                         <div class="title">
                             <i class="bi bi-person-rolodex"></i>
                             <span class="text">Editoras</span>
                         </div>
-
-                        <!-- Breadcrumb -->
                         <div class="wdaSever">
-                            <a href="Dashboard.html">Biblioteca Escola</a> >
+                            <a href="Dashboard.html">Biblioteca Escola</a> > 
                             <a href="Editoras.html">Editoras</a>
                         </div>
+                    </div>
 
-                    </div><!-- overview -->
-
-                    <!-- Botão cadastrar -->
                     <div id="lupa-grid">
                         <button type="button" class="button blue mobile" id="cadastrarEditora">
                             Cadastrar Nova Editora
@@ -178,9 +86,7 @@
 
                     <br>
 
-                    <!-- ================= TABELA ================= -->
                     <table id="tableEditora" class="records">
-
                         <thead>
                             <tr>
                                 <th>Nome</th>
@@ -191,70 +97,49 @@
                                 <th>Ação</th>
                             </tr>
                         </thead>
-
-                        <tbody>
-                            <!-- Dados inseridos via JS -->
-                        </tbody>
-
+                        <tbody></tbody>
                     </table>
 
-                    <!-- ================= MODAL EXCLUIR ================= -->
+                    <!-- MODAL EXCLUIR -->
                     <div class="modal" id="modal12">
-
                         <div class="modal-content">
-
                             <header class="modal-header">
                                 <h2>Excluir Editora</h2>
                                 <span class="modal-close" id="modalClos2">&#10006;</span>
                             </header>
-
-                            <!-- Aviso de delete -->
                             <div id="avisoDelete"></div>
-
                             <footer class="modal-footer">
                                 <button id="apagar" class="button red">Apagar</button>
                                 <button id="cancelar2" class="button blue">Cancelar</button>
                             </footer>
-
                         </div>
-
                     </div>
 
-                    <!-- ================= MODAL CRIAR/EDITAR ================= -->
+                    <!-- MODAL CRIAR/EDITAR -->
                     <div class="modal" id="modal">
-
                         <div class="modal-content">
-
                             <header class="modal-header">
                                 <h2>Nova Editora</h2>
                                 <span class="modal-close" id="modal-close">&#10006;</span>
                             </header>
-
-                            <!-- Formulário -->
                             <form id="form" class="modal-form">
-
-                                <input type="text" id="nome" class="modal-field" placeholder="Nome da Editora" required>
+                                <input type="text" id="nome" data-index="new" class="modal-field" placeholder="Nome da Editora" required>
                                 <input type="text" id="gerente" class="modal-field" placeholder="Nome do Gerente" required>
                                 <input type="email" id="email" class="modal-field" placeholder="E-mail da Editora" required>
                                 <input type="text" id="endereco" class="modal-field" placeholder="Endereço da Editora" required>
                                 <input type="text" id="celular" class="modal-field" placeholder="Celular da Editora" required>
                                 <input type="text" id="telefone" class="modal-field" placeholder="Telefone da Editora" required>
-
                             </form>
-
-                            <!-- Botões -->
                             <footer class="modal-footer">
                                 <button id="salvar" class="button green">Salvar</button>
                                 <button id="cancelar" class="button blue">Cancelar</button>
                             </footer>
-
                         </div>
-
                     </div>
 
-                </div><!-- activity -->
-            </div><!-- scroll -->
-        </div><!-- corpo-da-pag -->
+                </div>
+            </div>
+        </div>
 
     </section>
 </div>

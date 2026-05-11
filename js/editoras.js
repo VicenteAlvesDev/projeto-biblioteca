@@ -1,6 +1,6 @@
 'use strict'
-// nao sei se gosto de js, parece um crime de guerra
-const openModal1 = () => document.getElementById('modal').classList.add('active');
+
+const openModal = () => document.getElementById('modal').classList.add('active')
 const openModal2 = () => document.getElementById('modal12').classList.add('active');
 
 const closeModal2 = () => {
@@ -15,7 +15,6 @@ const closeModal = () => {
 const getLocalStorage = () => JSON.parse(localStorage.getItem('db_editora')) ?? [];
 const setLocalStorage = (dbEditora) => localStorage.setItem("db_editora", JSON.stringify(dbEditora));
 
-//CRUD - Create read update e delete
 const deleteEditora = (index) => {
     const dbEditora = readEditora();
     dbEditora.splice(index, 1);
@@ -36,19 +35,15 @@ const createEditora = (editora) => {
     setLocalStorage(dbEditora);
 }
 
-const isValidFields = () =>{
-    return document.getElementById('form').reportValidity();
-}
+const isValidFields = () => document.getElementById('form').reportValidity();
 
-//Interação com o layout
 const clearFields = () => {
     const fields = document.querySelectorAll('.modal-field');
     fields.forEach(field => field.value = "");
     document.getElementById('nome').dataset.index = 'new';
 }
 
-//campos para serem salvos
-const saveEditora = () =>{
+const saveEditora = () => {
     if(isValidFields()){
         const editora = {
             nome: document.getElementById('nome').value,
@@ -71,7 +66,6 @@ const saveEditora = () =>{
     }
 }
 
-//Tabela de Apresentaçao
 const createRow = (editora, index) => {
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
@@ -81,8 +75,8 @@ const createRow = (editora, index) => {
         <td>${editora.celular}</td>
         <td>${editora.telefone}</td>
         <td>
-            <button type="button" class="button green" id="edit-${index}">Editar</button>
-            <button type="button" class="button red" id="delete-${index}">Excluir</button>
+            <button type="button" class="button green edit-btn" data-index="${index}">Editar</button>
+            <button type="button" class="button red delete-btn" data-index="${index}">Excluir</button>
         </td>
     `
     document.querySelector('#tableEditora>tbody').appendChild(newRow);
@@ -90,7 +84,7 @@ const createRow = (editora, index) => {
 
 const clearTable = () => {
     const rows = document.querySelectorAll('#tableEditora>tbody tr');
-    rows.forEach(row => row.parentNode.removeChild(row));
+    rows.forEach(row => row.remove());
 }
 
 const updateTable = () => {
@@ -99,63 +93,53 @@ const updateTable = () => {
     dbEditora.forEach(createRow);
 }
 
-//Apresentaçao tabela modal e ediçao
-const fillFields = (editora) => {
+const fillFields = (editora, index) => {
     document.getElementById('nome').value = editora.nome;
     document.getElementById('gerente').value = editora.gerente;
     document.getElementById('email').value = editora.email;
     document.getElementById('endereco').value = editora.endereco;
     document.getElementById('celular').value = editora.celular;
     document.getElementById('telefone').value = editora.telefone;
-    document.getElementById('nome').dataset.index = editora.index;
+    document.getElementById('nome').dataset.index = index;
 }
 
 const editEditora = (index) => {
     const editora = readEditora()[index];
-    editora.index = index;
-    fillFields(editora);
-    openModal1();
+    fillFields(editora, index);
+    openModal();
 }
 
-const editDelete = (event) =>{
-    if(event.target.type == 'button'){
+let deleteIndex = null;
 
-        const [action, index] = event.target.id.split('-');
-
-        if(action == 'edit'){
-            editEditora(index);
-        }else{
-            const editora = readEditora()[index];
-            let avisoDelete = document.querySelector('#avisoDelete');
-
-            avisoDelete.textContent = `Deseja realmente excluir a editora ${editora.nome}?`
-            openModal2();
-
-            //Apagar o registro - remove listener anterior para evitar duplicação
-            const apagarBtn = document.getElementById('apagar');
-            const novoApagar = apagarBtn.cloneNode(true);
-            apagarBtn.parentNode.replaceChild(novoApagar, apagarBtn);
-            
-            novoApagar.addEventListener('click', () => {
-                deleteEditora(index);
-                updateTable();
-                closeModal2();
-            });
-        }
+const handleTableClick = (event) => {
+    const target = event.target;
+    if (target.classList.contains('edit-btn')) {
+        const index = target.getAttribute('data-index');
+        editEditora(index);
+    } else if (target.classList.contains('delete-btn')) {
+        deleteIndex = target.getAttribute('data-index');
+        const editora = readEditora()[deleteIndex];
+        const avisoDelete = document.querySelector('#avisoDelete');
+        avisoDelete.innerHTML = `<p>Deseja realmente excluir a editora ${editora.nome}?</p>`;
+        openModal2();
     }
 }
 
+document.getElementById('apagar')?.addEventListener('click', () => {
+    if (deleteIndex !== null) {
+        deleteEditora(deleteIndex);
+        updateTable();
+        closeModal2();
+        deleteIndex = null;
+    }
+});
+
 updateTable();
 
-// Eventos
-document.getElementById('cadastrarEditora').addEventListener('click', openModal1);
+document.getElementById('cadastrarEditora').addEventListener('click', openModal);
 document.getElementById('modal-close').addEventListener('click', closeModal);
-
-// Modal apagar
 document.getElementById('modalClos2').addEventListener('click', closeModal2);
 document.getElementById('salvar').addEventListener('click', saveEditora);
-document.querySelector('#tableEditora>tbody').addEventListener('click', editDelete);
+document.querySelector('#tableEditora>tbody').addEventListener('click', handleTableClick);
 document.getElementById('cancelar').addEventListener('click', closeModal);
-
-// modal apagar
 document.getElementById('cancelar2').addEventListener('click', closeModal2);

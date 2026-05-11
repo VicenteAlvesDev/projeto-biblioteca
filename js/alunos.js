@@ -1,7 +1,7 @@
 'use strict'
 
 const openModal = () => document.getElementById('modal').classList.add('active')
-const openModal2 = () => document.getElementById('modal2').classList.add('add')
+const openModal2 = () => document.getElementById('modal2').classList.add('active')
 
 const closeModal2 = () => {
     document.getElementById('modal2').classList.remove('active')
@@ -12,26 +12,26 @@ const closeModal = () => {
     document.getElementById('modal').classList.remove('active')
 }
 
-const getLocalStorage = () => JSON.parse(localStorage.getItem('db.aluno')) ?? []
+const getLocalStorage = () => JSON.parse(localStorage.getItem('db_aluno')) ?? []
 const setLocalStorage = (dbAluno) => localStorage.setItem("db_aluno", JSON.stringify(dbAluno))
 
-// CRUD - Creat Read Update Delete
+// CRUD
 const deleteAluno = (index) => {
-    const dbALuno = readAluno()
+    const dbAluno = readAluno()
     dbAluno.splice(index, 1)
     setLocalStorage(dbAluno)
 }
 
 const updateAluno = (index, aluno) => {
-    const dbALuno = readAluno()
+    const dbAluno = readAluno()
     dbAluno[index] = aluno
     setLocalStorage(dbAluno)
 }
 
 const readAluno = () => getLocalStorage()
 
-const creatAluno = (index) => {
-    const dbALuno = readAluno()
+const createAluno = (aluno) => {
+    const dbAluno = readAluno()
     dbAluno.push(aluno)
     setLocalStorage(dbAluno)
 }
@@ -40,21 +40,18 @@ const isValidFields = () => {
     return document.getElementById("form").reportValidity()
 }
 
-// Interação com o layout
 const clearFields = () => {
     const fields = document.querySelectorAll(".modal-field")
     fields.forEach(field => field.value = "")
     document.getElementById('nome').dataset.index = 'new'
 }
 
-// Campos para serem salvos
 const saveAluno = () => {
-    debugger
     if (isValidFields()) {
         const aluno = {
             nome: document.getElementById('nome').value,
             matricula: document.getElementById('matricula').value,
-            telefone: document.getElementById('telefone').value, 
+            telefone: document.getElementById('telefone').value,
             celular: document.getElementById('celular').value,
             email: document.getElementById('email').value,
             rua: document.getElementById('rua').value,
@@ -63,11 +60,11 @@ const saveAluno = () => {
             cidade: document.getElementById('cidade').value,
             estado: document.getElementById('estado').value,
             curso: document.getElementById('curso').value,
-            serie: document.getElementyById('curso').value,
+            serie: document.getElementById('serie').value,
         }
         const index = document.getElementById('nome').dataset.index
         if (index == 'new') {
-            creatAluno(aluno)
+            createAluno(aluno)
             updateTable()
             closeModal()
         } else {
@@ -78,8 +75,7 @@ const saveAluno = () => {
     }
 }
 
-// Tabela de Apresentação
-const creatRow = (aluno, index) => {
+const createRow = (aluno, index) => {
     const newRow = document.createElement('tr')
     newRow.innerHTML = `
         <td> ${aluno.nome} </td>
@@ -89,8 +85,8 @@ const creatRow = (aluno, index) => {
         <td> ${aluno.celular} </td>
         <td> ${aluno.email} </td>
         <td>
-            <button type="button" class="button green" id="edit-${index}"> Editar </button>
-            <button type="button" class="button green" id="edit-${index}"> Editar </button>
+            <button type="button" class="button green edit-btn" data-index="${index}">Editar</button>
+            <button type="button" class="button red delete-btn" data-index="${index}">Excluir</button>
         </td>
     `
     document.querySelector('#tableAluno>tbody').appendChild(newRow)
@@ -98,17 +94,17 @@ const creatRow = (aluno, index) => {
 
 const clearTable = () => {
     const rows = document.querySelectorAll('#tableAluno>tbody tr')
-    rows.forEach(row => row.parentNode.removeChild(row))
+    rows.forEach(row => row.remove())
 }
 
 const updateTable = () => {
     const dbAluno = readAluno()
     clearTable()
-    dbAluno.forEach(creatRow)
+    dbAluno.forEach(createRow)
+    atualizarDashboard()
 }
 
-// Apresentação tabela modal
-const fillFields = (aluno) => {
+const fillFields = (aluno, index) => {
     document.getElementById('nome').value = aluno.nome
     document.getElementById('matricula').value = aluno.matricula
     document.getElementById('telefone').value = aluno.telefone
@@ -120,53 +116,55 @@ const fillFields = (aluno) => {
     document.getElementById('cidade').value = aluno.cidade
     document.getElementById('estado').value = aluno.estado
     document.getElementById('curso').value = aluno.curso
-    document.getElementyById('curso').value = aluno.serie
-
-    document.getElementById("nome").dataset.index = aluno.index
+    document.getElementById('serie').value = aluno.serie
+    document.getElementById('nome').dataset.index = index
 }
 
 const editAluno = (index) => {
     const aluno = readAluno()[index]
-    aluno.index = index
-    fillFields(aluno)
+    fillFields(aluno, index)
     openModal()
 }
 
-const editDelete = (event) => {
-    if (event.target.type == 'button') {
-        const [action, index] = event.target.id.split('-')
+let deleteIndex = null
 
-        if (action == 'edit') {
-            editAluno(index)
-        } else {
-            const aluno = readAluno()[index]
-            let avisoDelete = document.querySelector('#avisoDelete')
-
-            avisoDelete.textContent = 'Deseja realmente excluir o aluno $(aluno.nome)'
-            openModal2()
-        
-            // APAGAR REGISTRO
-            document.getElementById('apagar').addEventListener('click', () => {
-                deleteAluno(index)
-                updateTable()
-                closeModal2()
-            })
-        }
+const handleTableClick = (event) => {
+    const target = event.target
+    if (target.classList.contains('edit-btn')) {
+        const index = target.getAttribute('data-index')
+        editAluno(index)
+    } else if (target.classList.contains('delete-btn')) {
+        deleteIndex = target.getAttribute('data-index')
+        const aluno = readAluno()[deleteIndex]
+        const avisoDelete = document.querySelector('#avisoDelete')
+        avisoDelete.innerHTML = `<p>Deseja realmente excluir o aluno ${aluno.nome}?</p>`
+        openModal2()
     }
 }
 
+const atualizarDashboard = () => {
+    const numeroAlunos = document.getElementById('number-alunos')
+    if (numeroAlunos) {
+        numeroAlunos.innerText = readAluno().length
+    }
+}
+
+// Eventos
+document.getElementById('apagar')?.addEventListener('click', () => {
+    if (deleteIndex !== null) {
+        deleteAluno(deleteIndex)
+        updateTable()
+        closeModal2()
+        deleteIndex = null
+    }
+})
+
+document.getElementById('cadastrarAluno')?.addEventListener('click', openModal)
+document.getElementById('modalClose')?.addEventListener('click', closeModal)
+document.getElementById('modalClose2')?.addEventListener('click', closeModal2)
+document.getElementById('salvar')?.addEventListener('click', saveAluno)
+document.getElementById('cancelar')?.addEventListener('click', closeModal)
+document.getElementById('cancelar2')?.addEventListener('click', closeModal2)
+document.querySelector('#tableAluno>tbody')?.addEventListener('click', handleTableClick)
+
 updateTable()
-
-//EVENTOS
-document.getElementById('cadastrarFuncionario').addEventListener('click', openModal)
-document.getElementById('modalClose').addEventListener('click', closeModal)
-
-// Modal Apagar
-document.getElementById('modalClose2').addEventListener('click', closeModal2)
-document.getElementById('salvar').addEventListener('click', saveFuncionario)
-document.getElementById('#tableFuncionario>body').addEventListener('click', editDelete)
-document.getElementById('cancelar').addEventListener('click', closeModal)
-
-// Modal Apagar
-document.getElementById('cancelar').addEventListener('click', closeModal2)
-

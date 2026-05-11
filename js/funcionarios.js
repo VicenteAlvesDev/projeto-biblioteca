@@ -1,6 +1,5 @@
 'use strict'
 
-// Variáveis para as telas modal e as tabelas no LocalStorage
 const openModal = () => document.getElementById('modal').classList.add('active')
 const openModal2 = () => document.getElementById('modal2').classList.add('active')
 
@@ -16,7 +15,6 @@ const closeModal = () => {
 const getLocalStorage = () => JSON.parse(localStorage.getItem('db_funcionario')) ?? []
 const setLocalStorage = (dbFuncionario) => localStorage.setItem('db_funcionario', JSON.stringify(dbFuncionario))
 
-// CRUD - create read update delete
 const deleteFuncionario = (index) => {
     const dbFuncionario = readFuncionario()
     dbFuncionario.splice(index, 1)
@@ -32,155 +30,122 @@ const updateFuncionario = (index, funcionario) => {
 const readFuncionario = () => getLocalStorage()
 
 const createFuncionario = (funcionario) => {
-    const dbFuncionario = getLocalStorage()
+    const dbFuncionario = readFuncionario()
     dbFuncionario.push(funcionario)
     setLocalStorage(dbFuncionario)
 }
 
-const isValidFields = () => {
-    return document.getElementById('form').reportValidity()
-}
+const isValidFields = () => document.getElementById('form').reportValidity()
 
-// Interação com o layout
 const clearFields = () => {
     const fields = document.querySelectorAll('.modal-field')
     fields.forEach(field => field.value = "")
     document.getElementById('nome').dataset.index = 'new'
 }
 
-// Apresentação dos campos que serão salvos na tabela Funcionário
 const saveFuncionario = () => {
     if (isValidFields()) {
         const funcionario = {
             nome: document.getElementById('nome').value,
             matricula: document.getElementById('matricula').value,
-            telefone: document.getElementById('telefone').value,
+            cargo: document.getElementById('cargo').value,
             celular: document.getElementById('celular').value,
             email: document.getElementById('email').value,
-            rua: document.getElementById('rua').value,
-            numero: document.getElementById('numero').value,
-            complemento: document.getElementById('complemento').value,
-            cidade: document.getElementById('cidade').value,
-            estado: document.getElementById('estado').value,
-            cpf: document.getElementById('cpf').value,
-            funcao: document.getElementById('funcao').value
+            endereco: document.getElementById('endereco').value,
         }
-        
         const index = document.getElementById('nome').dataset.index
-        
         if (index == 'new') {
             createFuncionario(funcionario)
-            updateTable()
-            closeModal()
         } else {
             updateFuncionario(index, funcionario)
-            updateTable()
-            closeModal()
         }
+        updateTable()
+        closeModal()
     }
 }
 
-// Apresentação tabela modal
-const fillFields = (funcionario) => {
-    document.getElementById('nome').value = funcionario.nome
-    document.getElementById('matricula').value = funcionario.matricula
-    document.getElementById('telefone').value = funcionario.telefone
-    document.getElementById('celular').value = funcionario.celular
-    document.getElementById('email').value = funcionario.email
-    document.getElementById('rua').value = funcionario.rua
-    document.getElementById('numero').value = funcionario.numero
-    document.getElementById('complemento').value = funcionario.complemento
-    document.getElementById('cidade').value = funcionario.cidade
-    document.getElementById('estado').value = funcionario.estado
-    document.getElementById('cpf').value = funcionario.cpf
-    document.getElementById('funcao').value = funcionario.funcao
-    
-    document.getElementById('nome').dataset.index = funcionario.index
+const createRow = (funcionario, index) => {
+    const newRow = document.createElement('tr')
+    newRow.innerHTML = `
+        <td> ${funcionario.nome} </td>
+        <td> ${funcionario.matricula} </td>
+        <td> ${funcionario.cargo} </td>
+        <td> ${funcionario.celular} </td>
+        <td> ${funcionario.email} </td>
+        <td>
+            <button type="button" class="button green edit-btn" data-index="${index}">Editar</button>
+            <button type="button" class="button red delete-btn" data-index="${index}">Excluir</button>
+        </td>
+    `
+    document.querySelector('#tableFuncionario>tbody').appendChild(newRow)
 }
 
-const editFuncionario = (index) => {
-    const funcionario = readFuncionario()[index]
-    funcionario.index = index
-    fillFields(funcionario)
-    openModal()
-}
-
-const editDelete = (event) => {
-    if (event.target.type == 'button') {
-        const [action, index] = event.target.id.split('-')
-        
-        if (action == 'edit') {
-            editFuncionario(index)
-        } else {
-            const funcionario = readFuncionario()[index]
-            let avisoDelete = document.querySelector('#avisoDelete')
-            
-            avisoDelete.textContent = `Deseja realmente excluir o funcionario ${funcionario.nome}`
-            openModal2()
-            
-            // APAGAR O REGISTRO
-            document.getElementById('apagar').addEventListener('click', () => {
-                deleteFuncionario(index)
-                updateTable()
-                closeModal2()
-            })
-        }
-    }
+const clearTable = () => {
+    const rows = document.querySelectorAll('#tableFuncionario>tbody tr')
+    rows.forEach(row => row.remove())
 }
 
 const updateTable = () => {
     const dbFuncionario = readFuncionario()
-    const tableBody = document.querySelector('#tableFuncionario>tbody')
-    tableBody.innerHTML = ''
-    
-    dbFuncionario.forEach((funcionario, index) => {
-        const row = tableBody.insertRow()
-        
-        row.insertCell(0).textContent = funcionario.nome
-        row.insertCell(1).textContent = funcionario.matricula
-        row.insertCell(2).textContent = funcionario.telefone
-        row.insertCell(3).textContent = funcionario.celular
-        row.insertCell(4).textContent = funcionario.email
-        row.insertCell(5).textContent = funcionario.rua
-        row.insertCell(6).textContent = funcionario.numero
-        row.insertCell(7).textContent = funcionario.complemento
-        row.insertCell(8).textContent = funcionario.cidade
-        row.insertCell(9).textContent = funcionario.estado
-        row.insertCell(10).textContent = funcionario.cpf
-        row.insertCell(11).textContent = funcionario.funcao
-        
-        // Botões de ação
-        const actionsCell = row.insertCell(12)
-        actionsCell.innerHTML = `
-            <button type="button" id="edit-${index}" class="btn-edit">Editar</button>
-            <button type="button" id="delete-${index}" class="btn-delete">Excluir</button>
-        `
-    })
+    clearTable()
+    dbFuncionario.forEach(createRow)
+    atualizarDashboard()
 }
 
-// Events
-document.getElementById('cadastrarFuncionario')
-    .addEventListener('click', openModal)
+const fillFields = (funcionario, index) => {
+    document.getElementById('nome').value = funcionario.nome
+    document.getElementById('matricula').value = funcionario.matricula
+    document.getElementById('cargo').value = funcionario.cargo
+    document.getElementById('celular').value = funcionario.celular
+    document.getElementById('email').value = funcionario.email
+    document.getElementById('endereco').value = funcionario.endereco
+    document.getElementById('nome').dataset.index = index
+}
 
-document.getElementById('modalClose')
-    .addEventListener('click', closeModal)
+const editFuncionario = (index) => {
+    const funcionario = readFuncionario()[index]
+    fillFields(funcionario, index)
+    openModal()
+}
 
-// modal apagar
-document.getElementById('modalClose2')
-    .addEventListener('click', closeModal2)
+let deleteIndex = null
 
-document.getElementById('salvar')
-    .addEventListener('click', saveFuncionario)
+const handleTableClick = (event) => {
+    const target = event.target
+    if (target.classList.contains('edit-btn')) {
+        const index = target.getAttribute('data-index')
+        editFuncionario(index)
+    } else if (target.classList.contains('delete-btn')) {
+        deleteIndex = target.getAttribute('data-index')
+        const funcionario = readFuncionario()[deleteIndex]
+        const avisoDelete = document.querySelector('#avisoDelete')
+        avisoDelete.innerHTML = `<p>Deseja realmente excluir o funcionário ${funcionario.nome}?</p>`
+        openModal2()
+    }
+}
 
-document.querySelector('#tableFuncionario>tbody')
-    .addEventListener('click', editDelete)
+const atualizarDashboard = () => {
+    const numeroFuncionarios = document.getElementById('number-funcionario')
+    if (numeroFuncionarios) {
+        numeroFuncionarios.innerText = readFuncionario().length
+    }
+}
 
-document.getElementById('cancelar')
-    .addEventListener('click', closeModal)
+document.getElementById('apagar')?.addEventListener('click', () => {
+    if (deleteIndex !== null) {
+        deleteFuncionario(deleteIndex)
+        updateTable()
+        closeModal2()
+        deleteIndex = null
+    }
+})
 
-// modal apagar
-document.getElementById('cancelar2')
-    .addEventListener('click', closeModal2)
+document.getElementById('cadastrarFuncionario')?.addEventListener('click', openModal)
+document.getElementById('modalClose')?.addEventListener('click', closeModal)
+document.getElementById('modalClose2')?.addEventListener('click', closeModal2)
+document.getElementById('salvar')?.addEventListener('click', saveFuncionario)
+document.getElementById('cancelar')?.addEventListener('click', closeModal)
+document.getElementById('cancelar2')?.addEventListener('click', closeModal2)
+document.querySelector('#tableFuncionario>tbody')?.addEventListener('click', handleTableClick)
 
-// Inicializar a tabela ao carregar a página
 updateTable()

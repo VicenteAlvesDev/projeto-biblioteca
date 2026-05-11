@@ -45,7 +45,7 @@ const isValidFields = () => {
 const clearFields = () => {
     const fields = document.querySelectorAll('.modal-field')
     fields.forEach(field => field.value = "")
-    document.getElementById('name').dataset.index = 'new'
+    document.getElementById('nome').dataset.index = 'new'  // era 'name'
 }
 // Campos para serem salvos
 const saveLivro = () => {

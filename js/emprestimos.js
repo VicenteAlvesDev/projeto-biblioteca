@@ -1,34 +1,25 @@
 'use strict'
 
+let ultimoCodigo = 0
+
 const openModal = () => document.getElementById('modal').classList.add('active')
-const openModal2 = () => document.getElementById('modal2').classList.add('active')
-
-const closeModal2 = () => {
-    document.getElementById('modal2').classList.remove('active')
-}
-
 const closeModal = () => {
-     clearFilds()
-     document.getElementById('modal').classList.remove('active')
+    document.getElementById('modal').classList.remove('active')
+    document.getElementById('form').reset()
 }
 
-const getLocalStorage = () => JSON.parse(localStorage.getItem('db_emprestimos')) ?? []
-const setlocalStorage = (dbEmprestimo) => localStorage.setItem("db_emprestimo", JSON.stringify(dbEmprestimo))
+const getLocalStorage = () => JSON.parse(localStorage.getItem('db_emprestimo')) ?? []
+const setLocalStorage = (dbEmprestimo) => localStorage.setItem("db_emprestimo", JSON.stringify(dbEmprestimo))
 
-//CRUD - create read update delete
-const deleteEmprestimo = (index) => {
-    const dbEmprestimo = readEmprestimo()
-    dbEmprestimo.splice(index, 1)
-    setLocalStorage(dbEmprestimo)
+const getLivros = () => JSON.parse(localStorage.getItem('db_livro')) ?? []
+const getAlunos = () => JSON.parse(localStorage.getItem('db_aluno')) ?? []
+const getFuncionarios = () => JSON.parse(localStorage.getItem('db_funcionario')) ?? []
+
+const getAllUsuarios = () => {
+    const alunos = getAlunos().map(a => ({ nome: a.nome, matricula: a.matricula, tipo: 'Aluno' }))
+    const funcionarios = getFuncionarios().map(f => ({ nome: f.nome, matricula: f.matricula, tipo: 'Funcionário' }))
+    return [...alunos, ...funcionarios]
 }
-
-const updateEmprestimo = (index, emprestimo) => {
-    const dbEmprestimo = readEmprestimo()
-    dbEmprestimo[index] = emprestimo
-    setLocalStorage(dbEmprestimo)
-}
-
-const readEmprestimo = () => getLocalStorage()
 
 const createEmprestimo = (emprestimo) => {
     const dbEmprestimo = getLocalStorage()
@@ -36,135 +27,110 @@ const createEmprestimo = (emprestimo) => {
     setLocalStorage(dbEmprestimo)
 }
 
-const isValidFields = () => {
-    return document.getElementById('form').reportValidity()
+const deleteEmprestimo = (index) => {
+    const dbEmprestimo = getLocalStorage()
+    dbEmprestimo.splice(index, 1)
+    setLocalStorage(dbEmprestimo)
+    updateTable()
 }
 
-//Interação com o layout
-const clearFields = () => {
-    const fields = document.querySelectorAll('.modal-field')
-    fields.forEach(field => field.value = "")
-    document.getElementById('nome').dataset.index = 'new'
-}
-
-//Campos para serem salvos
-const saveEmprestimo = () => {
-    debugger
-    if (isValidFields()) {
-        const emprestimo = {
-            codigo: document.getElementById('codigo').value,
-            tipo: document.getElementById('tipo').value,
-            nome: document.getElementById('nome').value,
-            livro: document.getElementById('livro').value,
-            dtemprestimo: document.getElementById('dtemprestimo').value,
-            dtdevolucao: document.getElementById('dtdevolucao').value
-        }
-        const index = document.getElementById('nome').dataset.index
-        if (index == 'new') {
-            createEmprestimo(emprestimo)
-            updateTable()
-            closeModal()
-        } else {
-            updateEmprestimo(index, emprestimo)
-            updateTable()
-            closeModal()
-        }
+const carregarSelects = () => {
+    const livroSelect = document.getElementById('m-livro-alug')
+    const usuarioSelect = document.getElementById('m-usuario')
+    
+    if (livroSelect) {
+        livroSelect.innerHTML = '<option value="">Selecione o Livro</option>'
+        const livros = getLivros()
+        livros.forEach(livro => {
+            const option = document.createElement('option')
+            option.value = livro.nome
+            option.textContent = `${livro.nome} - ${livro.autor}`
+            livroSelect.appendChild(option)
+        })
+    }
+    
+    if (usuarioSelect) {
+        usuarioSelect.innerHTML = '<option value="">Selecione o Usuário</option>'
+        const usuarios = getAllUsuarios()
+        usuarios.forEach(usuario => {
+            const option = document.createElement('option')
+            option.value = usuario.nome
+            option.textContent = `${usuario.nome} (${usuario.tipo})`
+            usuarioSelect.appendChild(option)
+        })
     }
 }
 
-//Tabela de apresentação
+const saveEmprestimo = () => {
+    const livroSelect = document.getElementById('m-livro-alug')
+    const usuarioSelect = document.getElementById('m-usuario')
+    const dataEmprestimo = document.getElementById('m-data-aluguel').value
+    const dataDevolucao = document.getElementById('m-prev-data').value
+
+    if (!livroSelect.value || !usuarioSelect.value || !dataEmprestimo || !dataDevolucao) {
+        alert('Preencha todos os campos!')
+        return
+    }
+
+    const emprestimos = getLocalStorage()
+    ultimoCodigo = emprestimos.length > 0 ? Math.max(...emprestimos.map(e => e.codigo)) + 1 : 1
+
+    const emprestimo = {
+        codigo: ultimoCodigo,
+        usuario: usuarioSelect.value,
+        livro: livroSelect.value,
+        dataEmprestimo: dataEmprestimo,
+        dataDevolucao: dataDevolucao,
+        status: 'Ativo'
+    }
+    createEmprestimo(emprestimo)
+    updateTable()
+    closeModal()
+}
+
 const createRow = (emprestimo, index) => {
     const newRow = document.createElement('tr')
     newRow.innerHTML = `
-        <td>$(emprestimo.codigo)</td>
-        <td>$(emprestimo.nome)</td>
-        <td>$(emprestimo.livro)</td>
-        <td>$(emprestimo.dtempretimo)</td>
-        <td>$(emprestimo.dtdevolucao)</td>
-
+        <td> ${emprestimo.codigo} </td>
+        <td> ${emprestimo.usuario} </td>
+        <td> ${emprestimo.livro} </td>
+        <td> ${emprestimo.dataEmprestimo} </td>
+        <td> ${emprestimo.dataDevolucao} </td>
         <td>
-            <button type="button" class="button green" id="edit-${index}">Editar<button>
-            <button type="button" class="button red" id="delete-${index}">Excluir<button>
+            <button type="button" class="button red delete-btn" data-index="${index}">Devolver</button>
         </td>
     `
-    document.querySelector('#tableEmprestimo>tbody').appendChild(newRow)
-    
+    document.querySelector('#tableEmprestimos>tbody').appendChild(newRow)
 }
 
 const clearTable = () => {
-    const rows = document.querySelectorAll('#tableEmprestimo>tbody tr')
-    rows.forEach(row  => row.parentNode.removeChild(row))
+    const rows = document.querySelectorAll('#tableEmprestimos>tbody tr')
+    rows.forEach(row => row.remove())
 }
 
 const updateTable = () => {
-    const dbEmprestimo = readEmprestimo()
+    const dbEmprestimo = getLocalStorage()
     clearTable()
     dbEmprestimo.forEach(createRow)
 }
 
-//Apresentação tabela modal
-const fillFields = (emprestio) => {
-    document.getElementById('codigo').value = emprestio.codigo
-    document.getElementById('tipo').value = emprestio.tipo
-    document.getElementById('nome').value = emprestio.nome
-    document.getElementById('livro').value = emprestio.livro
-    document.getElementById('dtemprestimo').value = emprestio.editora
-    document.getElementById('dtdevolucao').value = emprestio.isbn
-}
-
-const editEmprestimo = (index) => {
-    const emprestimo = readEmprestimo()[index]
-    emprestimo.index = index
-    fillFields(emprestimo)
-    openModal()
-}
-
-const editDelete = (event) => {
-    if (event.target.type == 'button') {
-
-        const [action, index] = event.target.id.split('-')
-
-        if (action == 'edit') {
-            editEmprestimo(index)
-        } else {
-            const emprestimo = readEmprestimo()[index]
-            let avisoDelete = document.querySelector('#avisoDelete')
-
-            avisoDelete.textContent = 'Deseja realmente excluir o emprestimo ${emprestimo.nome}'
-            openModal2()
-
-            //APAGAR O REGISTRO
-            document.getElementById('apagar').addEventListener('click', () => {
-                deleteEmprestimo(index)
-                updateTable()
-                closeModal2()
-            })
+const handleTableClick = (event) => {
+    if (event.target.classList.contains('delete-btn')) {
+        const index = event.target.getAttribute('data-index')
+        if (confirm('Deseja registrar a devolução deste livro?')) {
+            deleteEmprestimo(parseInt(index))
         }
     }
 }
 
+// Eventos
+document.getElementById('cadastrarCliente')?.addEventListener('click', () => {
+    carregarSelects()
+    openModal()
+})
+document.getElementById('modalClose')?.addEventListener('click', closeModal)
+document.getElementById('cancelar')?.addEventListener('click', closeModal)
+document.getElementById('salvar')?.addEventListener('click', saveEmprestimo)
+document.querySelector('#tableEmprestimos>tbody')?.addEventListener('click', handleTableClick)
+
 updateTable()
-
-//Eventos
-document.getElementById('cadastrarEmprestimo')
-.addEventListener('click', openModal)
-
-document.getElementById('modalClose')
-.addEventListener('click', closeModal)
-
-//modal apagar
-document.getElementById('modalClose2')
-.addEventListener('click', closeModal2)
-
-document.getElementById('salvar')
-.addEventListener('click', saveEmprestimo)
-
-document.querySelector('#tableEmprestimo>body')
-.addEventListener('click', editDelete)
-
-document.getElementById('cancelar')
-.addEventListener('click', closeModal)
-
-//modal apagar
-document.getElementById('cancelar2')
-.addEventListener('click', closeModal2)
